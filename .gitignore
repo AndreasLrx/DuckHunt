@@ -1,0 +1,14 @@
+# IDEs
+.vscode
+
+# Build Data
+*.o
+*.a
+*.so
+*.lib
+*.dll
+/build
+*.gcno
+*.gcda
+
+DuckHunt

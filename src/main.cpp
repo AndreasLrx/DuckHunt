@@ -7,7 +7,9 @@
 #include <ecstasy/registry/Registry.hpp>
 #include <ecstasy/resources/entity/RegistryEntity.hpp>
 #include <ecstasy/storages/MapStorage.hpp>
-#include <systems/DrawShape.hpp>
+#include "systems/ClearWindow.hpp"
+#include "systems/DisplayWindow.hpp"
+#include "systems/DrawShape.hpp"
 
 namespace esf = ecstasy::integration::sfml;
 namespace event = ecstasy::integration::event;
@@ -28,11 +30,10 @@ int main()
 
     registry.addSystem<esf::PollEvents>();
     registry.addSystem<DrawShape>();
+    registry.addSystem<DisplayWindow>();
+    registry.addSystem<ClearWindow>(sf::Color::White);
 
-    while (window.get().isOpen()) {
-        window.get().clear(sf::Color::White);
+    while (window.get().isOpen())
         registry.runSystems();
-        window.get().display();
-    }
     return 0;
 }

@@ -1,9 +1,10 @@
 set(SRCROOT ${PROJECT_SOURCE_DIR}/src)
 set(INCROOT ${PROJECT_SOURCE_DIR}/src)
 
-set(SRC
-    ${SRCROOT}/placeholder.cpp)
+set(SRC)
 set(INCDIRS ${INCROOT})
+
+add_subdirectory(systems)
 
 # Source groups are a feature in Visual Studio.
 source_group("" FILES ${SRC})
@@ -17,6 +18,8 @@ set_compiler_flags(${LIB_NAME})
 
 target_include_directories(${LIB_NAME} PRIVATE ${INCDIRS})
 target_include_directories(${LIB_NAME} PUBLIC ${INCROOT})
+target_link_libraries(${LIB_NAME} PUBLIC ecstasy)
+target_link_libraries_system(${LIB_NAME} PUBLIC sfml-graphics sfml-window sfml-system)
 
 add_executable(${TARGET_NAME} ${SRCROOT}/main.cpp)
 set_compiler_flags(${TARGET_NAME})

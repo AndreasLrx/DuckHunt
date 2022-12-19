@@ -32,13 +32,94 @@ void GameConfig::initialize()
         .setMouseCursorVisible(false);
 
     /// Background
-    auto back = ecstasy::RegistryEntity(
-        _registry.entityBuilder()
-            .with<sf::RectangleShape>(sf::Vector2f(static_cast<float>(_size.x), static_cast<float>(_size.y)))
-            .build(),
-        _registry);
-    back.get<sf::RectangleShape>().setTextureRect(sf::IntRect(67, 297, 256, 256));
-    back.get<sf::RectangleShape>().setTexture(&_textures.at("background"));
+    float scaleY = (static_cast<float>(_size.y) / 256.f);
+    float scaleX = (static_cast<float>(_size.x) / 256.f);
+
+    auto &back = _registry.entityBuilder()
+                     .with<sf::RectangleShape>(sf::Vector2f(static_cast<float>(_size.x), static_cast<float>(_size.y)))
+                     .build()
+                     .get(_registry.getStorage<sf::RectangleShape>());
+    back.setTextureRect(sf::IntRect(67, 297, 256, 256));
+    back.setTexture(&_textures.at("background"));
+
+    auto &backBlurTop = _registry.entityBuilder()
+                            .with<sf::RectangleShape>(sf::Vector2f(static_cast<float>(_size.x), 188 * scaleY))
+                            .build()
+                            .get(_registry.getStorage<sf::RectangleShape>());
+    backBlurTop.setTextureRect(sf::IntRect(67, 687, 256, 188));
+    backBlurTop.setTexture(&_textures.at("background"));
+
+    auto &backBlurBottom = _registry.entityBuilder()
+                               .with<sf::RectangleShape>(sf::Vector2f(static_cast<float>(_size.x), 36 * scaleY))
+                               .build()
+                               .get(_registry.getStorage<sf::RectangleShape>());
+    backBlurBottom.setTextureRect(sf::IntRect(67, 877, 256, 36));
+    backBlurBottom.setTexture(&_textures.at("background"));
+    backBlurBottom.setPosition(0, static_cast<float>(_size.y) - 36 * scaleY);
+
+    auto &backBush = _registry.entityBuilder()
+                         .with<sf::RectangleShape>(sf::Vector2f(32 * scaleX, 64 * scaleY))
+                         .build()
+                         .get(_registry.getStorage<sf::RectangleShape>());
+    backBush.setTextureRect(sf::IntRect(61, 595, 32, 64));
+    backBush.setTexture(&_textures.at("background"));
+    backBush.setPosition(194 * scaleX, 135 * scaleY);
+
+    auto &backTree = _registry.entityBuilder()
+                         .with<sf::RectangleShape>(sf::Vector2f(56 * scaleX, 130 * scaleY))
+                         .build()
+                         .get(_registry.getStorage<sf::RectangleShape>());
+    backTree.setTextureRect(sf::IntRect(3, 555, 56, 130));
+    backTree.setTexture(&_textures.at("background"));
+    backTree.setPosition(10 * scaleX, 69 * scaleY);
+
+    auto &backTreeBush1 = _registry.entityBuilder()
+                              .with<sf::RectangleShape>(sf::Vector2f(32 * scaleX, 24 * scaleY))
+                              .build()
+                              .get(_registry.getStorage<sf::RectangleShape>());
+    backTreeBush1.setTextureRect(sf::IntRect(137, 595, 32, 24));
+    backTreeBush1.setTexture(&_textures.at("background"));
+    backTreeBush1.setPosition(13 * scaleX, 47 * scaleY);
+
+    auto &backTreeBush2 = _registry.entityBuilder()
+                              .with<sf::RectangleShape>(sf::Vector2f(32 * scaleX, 24 * scaleY))
+                              .build()
+                              .get(_registry.getStorage<sf::RectangleShape>());
+    backTreeBush2.setTextureRect(sf::IntRect(231, 595, 32, 24));
+    backTreeBush2.setTexture(&_textures.at("background"));
+    backTreeBush2.setPosition(36 * scaleX, 70 * scaleY);
+
+    auto &backTreeBush3 = _registry.entityBuilder()
+                              .with<sf::RectangleShape>(sf::Vector2f(24 * scaleX, 16 * scaleY))
+                              .build()
+                              .get(_registry.getStorage<sf::RectangleShape>());
+    backTreeBush3.setTextureRect(sf::IntRect(265, 595, 24, 16));
+    backTreeBush3.setTexture(&_textures.at("background"));
+    backTreeBush3.setPosition(29 * scaleX, 90 * scaleY);
+
+    auto &backTreeBush4 = _registry.entityBuilder()
+                              .with<sf::RectangleShape>(sf::Vector2f(24 * scaleX, 24 * scaleY))
+                              .build()
+                              .get(_registry.getStorage<sf::RectangleShape>());
+    backTreeBush4.setTextureRect(sf::IntRect(205, 595, 24, 24));
+    backTreeBush4.setTexture(&_textures.at("background"));
+    backTreeBush4.setPosition(7 * scaleX, 93 * scaleY);
+
+    auto &backTreeBush5 = _registry.entityBuilder()
+                              .with<sf::RectangleShape>(sf::Vector2f(32 * scaleX, 24 * scaleY))
+                              .build()
+                              .get(_registry.getStorage<sf::RectangleShape>());
+    backTreeBush5.setTextureRect(sf::IntRect(137, 595, 32, 24));
+    backTreeBush5.setTexture(&_textures.at("background"));
+    backTreeBush5.setPosition(46 * scaleX, 103 * scaleY);
+
+    auto &backGrass = _registry.entityBuilder()
+                          .with<sf::RectangleShape>(sf::Vector2f(static_cast<float>(_size.x), 38 * scaleY))
+                          .build()
+                          .get(_registry.getStorage<sf::RectangleShape>());
+    backGrass.setTextureRect(sf::IntRect(61, 555, 256, 38));
+    backGrass.setTexture(&_textures.at("background"));
+    backGrass.setPosition(0, static_cast<float>(_size.y) - 93 * scaleY);
 
     /// Target
     auto &targetRect = _registry.entityBuilder()

@@ -12,11 +12,12 @@
 #ifndef GAMECONFIG_HPP_
 #define GAMECONFIG_HPP_
 
+#include <SFML/Graphics.hpp>
 #include <ecstasy/registry/Registry.hpp>
 
 class GameConfig {
   public:
-    GameConfig();
+    GameConfig(unsigned int size = 256);
     ~GameConfig() = default;
 
     void initialize();
@@ -27,7 +28,9 @@ class GameConfig {
     void render();
 
   private:
+    std::unordered_map<std::string, sf::Texture> _textures;
     ecstasy::Registry _registry;
+    sf::Vector2i _size;
 
     static constexpr size_t _game_loop_system_mask = 0xff00000000000000;
     static constexpr size_t _game_loop_inputs = 0x0100000000000000;

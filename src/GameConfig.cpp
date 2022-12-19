@@ -6,6 +6,8 @@
 #include <ecstasy/registry/Registry.hpp>
 #include <ecstasy/resources/entity/RegistryEntity.hpp>
 #include <ecstasy/storages/MapStorage.hpp>
+#include "components/Position.hpp"
+#include "components/Size.hpp"
 #include "systems/ClearWindow.hpp"
 #include "systems/DisplayWindow.hpp"
 #include "systems/DrawShape.hpp"
@@ -16,23 +18,35 @@
 namespace esf = ecstasy::integration::sfml;
 namespace event = ecstasy::integration::event;
 
-GameConfig::GameConfig()
+GameConfig::GameConfig(unsigned int size) : _size(size, size)
 {
     initialize();
 }
 
 void GameConfig::initialize()
 {
-    _registry.addResource<esf::RenderWindow>(sf::VideoMode(1280, 720), "Duck Hunt");
+    _textures.emplace(std::make_pair("background", sf::Texture())).first->second.loadFromFile("assets/backgrounds.png");
+    _registry.addResource<esf::RenderWindow>(sf::VideoMode(_size.x, _size.y), "Duck Hunt");
 
+    /// Background
+    auto back = ecstasy::RegistryEntity(
+        _registry.entityBuilder()
+            .with<sf::RectangleShape>(sf::Vector2f(static_cast<float>(_size.x), static_cast<float>(_size.y)))
+            .build(),
+        _registry);
+    back.get<sf::RectangleShape>().setTextureRect(sf::IntRect(67, 297, 256, 256));
+    back.get<sf::RectangleShape>().setTexture(&_textures.at("background"));
+
+    /// Target
     _registry.entityBuilder()
         .with<sf::CircleShape>(10.f)
-        .with<sf::Color>(sf::Color::Red)
         .with<event::MouseMoveListener>([](ecstasy::Registry &r, ecstasy::Entity entity,
                                             const event::MouseMoveEvent &e) {
             entity.get(r.getStorage<sf::CircleShape>()).setPosition(static_cast<float>(e.x), static_cast<float>(e.y));
         })
-        .build();
+        .build()
+        .get(_registry.getStorage<sf::CircleShape>())
+        .setFillColor(sf::Color::Red);
 
     _registry.addSystem<esf::PollEvents, _game_loop_inputs>();
     _registry.addSystem<ClearWindow, _game_loop_render>(sf::Color::White);

@@ -4,7 +4,7 @@
 
 int main()
 {
-    GameConfig config;
+    GameConfig config(512);
 
     try {
         config.run();

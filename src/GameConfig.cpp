@@ -26,7 +26,10 @@ GameConfig::GameConfig(unsigned int size) : _size(size, size)
 void GameConfig::initialize()
 {
     _textures.emplace(std::make_pair("background", sf::Texture())).first->second.loadFromFile("assets/backgrounds.png");
-    _registry.addResource<esf::RenderWindow>(sf::VideoMode(_size.x, _size.y), "Duck Hunt");
+    _textures.emplace(std::make_pair("target", sf::Texture())).first->second.loadFromFile("assets/target.png");
+    _registry.addResource<esf::RenderWindow>(sf::VideoMode(_size.x, _size.y), "Duck Hunt")
+        .get()
+        .setMouseCursorVisible(false);
 
     /// Background
     auto back = ecstasy::RegistryEntity(
@@ -38,15 +41,17 @@ void GameConfig::initialize()
     back.get<sf::RectangleShape>().setTexture(&_textures.at("background"));
 
     /// Target
-    _registry.entityBuilder()
-        .with<sf::CircleShape>(10.f)
-        .with<event::MouseMoveListener>([](ecstasy::Registry &r, ecstasy::Entity entity,
-                                            const event::MouseMoveEvent &e) {
-            entity.get(r.getStorage<sf::CircleShape>()).setPosition(static_cast<float>(e.x), static_cast<float>(e.y));
-        })
-        .build()
-        .get(_registry.getStorage<sf::CircleShape>())
-        .setFillColor(sf::Color::Red);
+    auto &targetRect = _registry.entityBuilder()
+                           .with<sf::RectangleShape>(sf::Vector2f(30.f, 30.f))
+                           .with<event::MouseMoveListener>(
+                               [](ecstasy::Registry &r, ecstasy::Entity entity, const event::MouseMoveEvent &e) {
+                                   entity.get(r.getStorage<sf::RectangleShape>())
+                                       .setPosition(static_cast<float>(e.x), static_cast<float>(e.y));
+                               })
+                           .build()
+                           .get(_registry.getStorage<sf::RectangleShape>());
+    targetRect.setOrigin(sf::Vector2f(15.f, 15.f));
+    targetRect.setTexture(&_textures.at("target"));
 
     _registry.addSystem<esf::PollEvents, _game_loop_inputs>();
     _registry.addSystem<ClearWindow, _game_loop_render>(sf::Color::White);

@@ -14,6 +14,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <ecstasy/registry/Registry.hpp>
+#include "Game.hpp"
 
 class GameConfig {
   public:
@@ -27,6 +28,15 @@ class GameConfig {
     void update();
     void render();
 
+    constexpr ecstasy::Registry &getRegistry()
+    {
+        return _registry;
+    }
+
+    sf::Vector2i getSize();
+
+    sf::Texture &getTexture(std::string name);
+
   private:
     void addBackground(
         sf::IntRect rect, sf::Vector2f position = sf::Vector2f(0.f, 0.f), const std::string &texture = "background");
@@ -34,6 +44,7 @@ class GameConfig {
     std::unordered_map<std::string, sf::Texture> _textures;
     ecstasy::Registry _registry;
     sf::Vector2i _size;
+    Game _game;
 
     static constexpr size_t _game_loop_system_mask = 0xff00000000000000;
     static constexpr size_t _game_loop_inputs = 0x0100000000000000;

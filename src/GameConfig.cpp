@@ -6,6 +6,7 @@
 #include <ecstasy/registry/Registry.hpp>
 #include <ecstasy/resources/entity/RegistryEntity.hpp>
 #include <ecstasy/storages/MapStorage.hpp>
+#include "RandomDevice.hpp"
 #include "components/Position.hpp"
 #include "components/Size.hpp"
 #include "systems/ClearWindow.hpp"
@@ -43,9 +44,12 @@ void GameConfig::initialize()
     _textures.emplace(std::make_pair("background", sf::Texture())).first->second.loadFromFile("assets/backgrounds.png");
     _textures.emplace(std::make_pair("sprites", sf::Texture())).first->second.loadFromFile("assets/sprites.png");
     _textures.emplace(std::make_pair("target", sf::Texture())).first->second.loadFromFile("assets/target.png");
-    _registry.addResource<esf::RenderWindow>(sf::VideoMode(_size.x, _size.y), "Duck Hunt")
+    _registry
+        .addResource<esf::RenderWindow>(
+            sf::VideoMode(static_cast<int>(_size.x), static_cast<int>(_size.y)), "Duck Hunt")
         .get()
         .setMouseCursorVisible(false);
+    _registry.addResource<RandomDevice>();
 
     // Back
     addBackground(sf::IntRect(67, 297, 256, 256));
@@ -104,6 +108,8 @@ void GameConfig::initialize()
     _registry.addSystem<ClearWindow, _game_loop_render>(sf::Color::White);
     _registry.addSystem<DrawShape, _game_loop_render + 1000>();
     _registry.addSystem<DisplayWindow, _game_loop_render + 1000000>();
+
+    _game.newRound(*this);
 }
 
 void GameConfig::run()
@@ -142,4 +148,14 @@ void GameConfig::update()
 void GameConfig::render()
 {
     _registry.runSystems(_game_loop_render, _game_loop_system_mask);
+}
+
+sf::Vector2i GameConfig::getSize()
+{
+    return _size;
+}
+
+sf::Texture &GameConfig::getTexture(std::string name)
+{
+    return _textures.at(name);
 }

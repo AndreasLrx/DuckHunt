@@ -2,8 +2,12 @@ set(SRCROOT ${PROJECT_SOURCE_DIR}/src)
 set(INCROOT ${PROJECT_SOURCE_DIR}/src)
 
 set(SRC
+    ${SRCROOT}/Game.cpp
+    ${INCROOT}/Game.hpp
     ${SRCROOT}/GameConfig.cpp
-    ${INCROOT}/GameConfig.hpp)
+    ${INCROOT}/GameConfig.hpp
+    ${SRCROOT}/Player.cpp
+    ${INCROOT}/Player.hpp)
 set(INCDIRS ${INCROOT})
 
 add_subdirectory(systems)

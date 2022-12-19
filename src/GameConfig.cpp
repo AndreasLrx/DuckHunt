@@ -18,12 +18,12 @@
 namespace esf = ecstasy::integration::sfml;
 namespace event = ecstasy::integration::event;
 
-GameConfig::GameConfig(unsigned int size) : _size(size, size)
+GameConfig::GameConfig(unsigned int size) : _size(static_cast<int>(size), static_cast<int>(size))
 {
     initialize();
 }
 
-void GameConfig::addBackground(sf::IntRect bounds, sf::Vector2f position)
+void GameConfig::addBackground(sf::IntRect bounds, sf::Vector2f position, const std::string &texture)
 {
     float scaleY = (static_cast<float>(_size.y) / 256.f);
     float scaleX = (static_cast<float>(_size.x) / 256.f);
@@ -34,13 +34,14 @@ void GameConfig::addBackground(sf::IntRect bounds, sf::Vector2f position)
                      .build()
                      .get(_registry.getStorage<sf::RectangleShape>());
     rect.setTextureRect(bounds);
-    rect.setTexture(&_textures.at("background"));
+    rect.setTexture(&_textures.at(texture));
     rect.setPosition(position.x * scaleX, position.y * scaleY);
 }
 
 void GameConfig::initialize()
 {
     _textures.emplace(std::make_pair("background", sf::Texture())).first->second.loadFromFile("assets/backgrounds.png");
+    _textures.emplace(std::make_pair("sprites", sf::Texture())).first->second.loadFromFile("assets/sprites.png");
     _textures.emplace(std::make_pair("target", sf::Texture())).first->second.loadFromFile("assets/target.png");
     _registry.addResource<esf::RenderWindow>(sf::VideoMode(_size.x, _size.y), "Duck Hunt")
         .get()
@@ -65,6 +66,26 @@ void GameConfig::initialize()
 
     /// Grass
     addBackground(sf::IntRect(61, 555, 256, 38), sf::Vector2f(0.f, 163.f));
+
+    /// Round, shots, level, score
+    addBackground(sf::IntRect(325, 409, 24, 8), sf::Vector2f(24.f, 208.f), "sprites");
+    addBackground(sf::IntRect(445, 428, 29, 21), sf::Vector2f(21.f, 221.f), "sprites");
+    addBackground(sf::IntRect(325, 428, 117, 21), sf::Vector2f(61.f, 221.f), "sprites");
+    addBackground(sf::IntRect(421, 406, 53, 21), sf::Vector2f(189.f, 221.f), "sprites");
+
+    /// Shots
+    addBackground(sf::IntRect(64, 386, 4, 7), sf::Vector2f(25.f, 224.f), "sprites");
+    addBackground(sf::IntRect(64, 386, 4, 7), sf::Vector2f(33.5f, 224.f), "sprites");
+    addBackground(sf::IntRect(64, 386, 4, 7), sf::Vector2f(42.f, 224.f), "sprites");
+    addBackground(sf::IntRect(133, 450, 21, 6), sf::Vector2f(25.f, 233.f), "sprites");
+
+    /// Ducks
+    for (int i = 0; i < 10; i++)
+        addBackground(sf::IntRect(340, 386, 7, 7), sf::Vector2f(96.f + static_cast<float>(i) * 8.f, 224.f), "sprites");
+
+    // Score
+    for (int i = 0; i < 6; i++)
+        addBackground(sf::IntRect(357, 385, 7, 7), sf::Vector2f(192.f + static_cast<float>(i) * 8.f, 224.f), "sprites");
 
     /// Target
     auto &targetRect = _registry.entityBuilder()

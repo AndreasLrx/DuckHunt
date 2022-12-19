@@ -28,7 +28,8 @@ class GameConfig {
     void render();
 
   private:
-    void addBackground(sf::IntRect rect, sf::Vector2f position = sf::Vector2f(0.f, 0.f));
+    void addBackground(
+        sf::IntRect rect, sf::Vector2f position = sf::Vector2f(0.f, 0.f), const std::string &texture = "background");
 
     std::unordered_map<std::string, sf::Texture> _textures;
     ecstasy::Registry _registry;

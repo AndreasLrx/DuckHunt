@@ -27,7 +27,8 @@ class RandomDevice : public ecstasy::Resource {
     template <typename numeric>
     numeric randInt(numeric min, numeric max)
     {
-        std::uniform_int_distribution<std::mt19937::result_type> dist(min, max);
+        std::uniform_int_distribution<std::mt19937::result_type> dist(
+            static_cast<unsigned int>(min), static_cast<unsigned int>(max));
 
         return static_cast<numeric>(dist(_generation));
     }

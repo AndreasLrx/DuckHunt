@@ -3,10 +3,10 @@
 
 #include "Game.hpp"
 #include "GameConfig.hpp"
-#include "RandomDevice.hpp"
 #include "components/DrawOrder.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
+#include "resources/RandomDevice.hpp"
 
 Game::Game() : _score(0), _round(0)
 {
@@ -16,6 +16,7 @@ void Game::newRound(GameConfig &config)
 {
     ++_round;
     newWave(config);
+    _score += 1000;
 }
 
 void Game::newWave(GameConfig &config)

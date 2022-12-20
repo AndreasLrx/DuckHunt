@@ -6,11 +6,11 @@
 #include <ecstasy/registry/Registry.hpp>
 #include <ecstasy/resources/entity/RegistryEntity.hpp>
 #include <ecstasy/storages/MapStorage.hpp>
-#include "RandomDevice.hpp"
 #include "components/DrawOrder.hpp"
 #include "components/Position.hpp"
 #include "components/Size.hpp"
 #include "resources/FixedClock.hpp"
+#include "resources/RandomDevice.hpp"
 #include "systems/ClearWindow.hpp"
 #include "systems/DisplayWindow.hpp"
 #include "systems/DrawShape.hpp"
@@ -51,7 +51,7 @@ void GameConfig::initialize()
     _textures.emplace(std::make_pair("target", sf::Texture())).first->second.loadFromFile("assets/target.png");
     _registry
         .addResource<esf::RenderWindow>(
-            sf::VideoMode(static_cast<int>(_size.x), static_cast<int>(_size.y)), "Duck Hunt")
+            sf::VideoMode(static_cast<unsigned int>(_size.x), static_cast<unsigned int>(_size.y)), "Duck Hunt")
         .get()
         .setMouseCursorVisible(false);
     _registry.addResource<RandomDevice>();

@@ -6,7 +6,9 @@
 #include <ecstasy/registry/Registry.hpp>
 #include <ecstasy/resources/entity/RegistryEntity.hpp>
 #include <ecstasy/storages/MapStorage.hpp>
+#include "Actions.hpp"
 #include "components/DrawOrder.hpp"
+#include "components/Duck.hpp"
 #include "components/Position.hpp"
 #include "components/Size.hpp"
 #include "resources/FixedClock.hpp"
@@ -16,11 +18,14 @@
 #include "systems/DrawShape.hpp"
 #include "systems/GetRenderWindow.hpp"
 #include "systems/Movement.hpp"
+#include <ecstasy/integrations/user_action/ActionListener.hpp>
+#include <ecstasy/integrations/user_action/Users.hpp>
 
 #include "GameConfig.hpp"
 
 namespace esf = ecstasy::integration::sfml;
 namespace event = ecstasy::integration::event;
+namespace user_action = ecstasy::integration::user_action;
 
 GameConfig::GameConfig(unsigned int size) : _size(static_cast<int>(size), static_cast<int>(size))
 {
@@ -99,18 +104,39 @@ void GameConfig::initialize()
             sf::IntRect(357, 385, 7, 7), 1010, sf::Vector2f(192.f + static_cast<float>(i) * 8.f, 224.f), "sprites");
 
     /// Target
-    auto &targetRect = _registry.entityBuilder()
-                           .with<sf::RectangleShape>(sf::Vector2f(30.f, 30.f))
-                           .with<event::MouseMoveListener>(
-                               [](ecstasy::Registry &r, ecstasy::Entity entity, const event::MouseMoveEvent &e) {
-                                   entity.get(r.getStorage<sf::RectangleShape>())
-                                       .setPosition(static_cast<float>(e.x), static_cast<float>(e.y));
-                               })
-                           .with<DrawOrder>(100)
-                           .build()
-                           .get(_registry.getStorage<sf::RectangleShape>());
+    auto &targetRect =
+        _registry.entityBuilder()
+            .with<sf::RectangleShape>(sf::Vector2f(30.f, 30.f))
+            .with<event::MouseMoveListener>(
+                [](ecstasy::Registry &r, ecstasy::Entity entity, const event::MouseMoveEvent &e) {
+                    entity.get(r.getStorage<sf::RectangleShape>())
+                        .setPosition(static_cast<float>(e.x), static_cast<float>(e.y));
+                })
+            .with<DrawOrder>(100)
+            .with<user_action::ActionListener>(
+                [](ecstasy::Registry &r, ecstasy::Entity e, user_action::Action a) {
+                    if (!a.value)
+                        return;
+                    auto target = e.get(r.getStorage<sf::RectangleShape>()).getPosition();
+                    for (auto [rect, duck, entity] : r.query<sf::RectangleShape, Duck, ecstasy::Entities>()) {
+                        (void)duck;
+                        if (rect.getGlobalBounds().contains(target))
+                            r.eraseEntity(entity);
+                    }
+                },
+                static_cast<size_t>(Actions::Shot))
+            .build()
+            .get(_registry.getStorage<sf::RectangleShape>());
     targetRect.setOrigin(sf::Vector2f(15.f, 15.f));
     targetRect.setTexture(&_textures.at("target"));
+
+    /// User
+    user_action::Users &users = _registry.addResource<user_action::Users>();
+    auto &binds = users.getUserProfile().getActionBindings().getBindings();
+    binds.emplace_back(static_cast<size_t>(Actions::Shot), event::Mouse::Button::Left);
+    binds.emplace_back(static_cast<size_t>(Actions::Shot), event::Keyboard::Key::Space);
+    binds.emplace_back(static_cast<size_t>(Actions::Shot), event::Gamepad::Button::FaceDown);
+    users.updateBindings();
 
     _registry.addSystem<esf::PollEvents, _game_loop_inputs>();
     _registry.addSystem<ClearWindow, _game_loop_render>(sf::Color::White);

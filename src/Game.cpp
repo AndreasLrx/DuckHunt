@@ -4,6 +4,7 @@
 #include "Game.hpp"
 #include "GameConfig.hpp"
 #include "components/DrawOrder.hpp"
+#include "components/Duck.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 #include "resources/RandomDevice.hpp"
@@ -40,6 +41,7 @@ void Game::addDuck(GameConfig &config)
                          static_cast<float>(rand.randInt(0, 160)) * scaleY)
                      .with<DrawOrder>(0)
                      .with<Velocity>(20.f * scaleX, 20.f * scaleY)
+                     .with<Duck>()
                      .build()
                      .get(config.getRegistry().getStorage<sf::RectangleShape>());
     rect.setTexture(&config.getTexture("sprites"));

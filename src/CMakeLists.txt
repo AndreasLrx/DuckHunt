@@ -26,7 +26,7 @@ set_compiler_flags(${LIB_NAME})
 target_include_directories(${LIB_NAME} PRIVATE ${INCDIRS})
 target_include_directories(${LIB_NAME} PUBLIC ${INCROOT})
 target_link_libraries(${LIB_NAME} PUBLIC ecstasy)
-target_link_libraries_system(${LIB_NAME} PUBLIC sfml-graphics sfml-window sfml-system)
+target_link_libraries_system(${LIB_NAME} PUBLIC sfml-graphics sfml-window sfml-system tomlplusplus::tomlplusplus)
 
 add_executable(${TARGET_NAME} ${SRCROOT}/main.cpp)
 set_compiler_flags(${TARGET_NAME})

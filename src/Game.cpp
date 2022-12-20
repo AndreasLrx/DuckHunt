@@ -10,22 +10,36 @@
 #include "resources/AssetsMap.hpp"
 #include "resources/RandomDevice.hpp"
 
-Game::Game(sf::Vector2f scale) : _scale(scale), _score(0), _round(0)
+#include <iostream>
+
+Game::Game(sf::Vector2f scale) : _scale(scale), _score(0), _wave(0), _round(0)
 {
 }
 
 void Game::newRound(ecstasy::Registry &registry)
 {
+    if (_round > 0)
+        _score += 1000;
     ++_round;
+    _wave = 0;
     newWave(registry);
-    _score += 1000;
 }
 
 void Game::newWave(ecstasy::Registry &registry)
 {
+    ++_wave;
+    std::cerr << "Round " << _round << ", Wave " << _wave << std::endl;
     _player.reloadAmmo();
     for (int i = 0; i < 2; i++)
         addDuck(registry);
+}
+
+void Game::endWave(ecstasy::Registry &registry)
+{
+    if (_wave == 5)
+        newRound(registry);
+    else
+        newWave(registry);
 }
 
 void Game::addDuck(ecstasy::Registry &registry)

@@ -28,9 +28,7 @@ namespace esf = ecstasy::integration::sfml;
 namespace event = ecstasy::integration::event;
 namespace user_action = ecstasy::integration::user_action;
 
-GameConfig::GameConfig(unsigned int size)
-    : _size(static_cast<int>(size), static_cast<int>(size)),
-      _game(sf::Vector2f(static_cast<float>(_size.x) / 256.f, static_cast<float>(_size.y) / 256.f))
+GameConfig::GameConfig(unsigned int size) : _size(static_cast<int>(size), static_cast<int>(size))
 {
     initialize();
 }
@@ -60,6 +58,8 @@ void GameConfig::initialize()
         .get()
         .setMouseCursorVisible(false);
     _registry.addResource<RandomDevice>();
+    auto &game = _registry.addResource<Game>(
+        sf::Vector2f(static_cast<float>(_size.x) / 256.f, static_cast<float>(_size.y) / 256.f));
     auto &textures = _registry.addResource<Textures>();
     textures.emplace("background").loadFromFile("assets/backgrounds.png");
     textures.emplace("sprites").loadFromFile("assets/sprites.png");
@@ -124,8 +124,12 @@ void GameConfig::initialize()
                     auto target = e.get(r.getStorage<sf::RectangleShape>()).getPosition();
                     for (auto [rect, duck, entity] : r.query<sf::RectangleShape, Duck, ecstasy::Entities>()) {
                         (void)duck;
-                        if (rect.getGlobalBounds().contains(target))
+                        if (rect.getGlobalBounds().contains(target)) {
                             r.eraseEntity(entity);
+                            auto q = r.query<Duck>();
+                            if (q.getMask().firstSet() == q.getMask().size() - 1)
+                                r.getResource<Game>().endWave(r);
+                        }
                     }
                 },
                 static_cast<size_t>(Actions::Shot))
@@ -148,7 +152,7 @@ void GameConfig::initialize()
     _registry.addSystem<DisplayWindow, _game_loop_render + 1000000>();
     _registry.addSystem<Movement, _game_loop_update>();
 
-    _game.newRound(_registry);
+    game.newRound(_registry);
 }
 
 void GameConfig::run()

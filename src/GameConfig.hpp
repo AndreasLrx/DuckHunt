@@ -41,7 +41,6 @@ class GameConfig {
 
     ecstasy::Registry _registry;
     sf::Vector2i _size;
-    Game _game;
 
     static constexpr size_t _game_loop_system_mask = 0xff00000000000000;
     static constexpr size_t _game_loop_inputs = 0x0100000000000000;

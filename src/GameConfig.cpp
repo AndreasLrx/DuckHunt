@@ -7,6 +7,7 @@
 #include <ecstasy/resources/entity/RegistryEntity.hpp>
 #include <ecstasy/storages/MapStorage.hpp>
 #include "RandomDevice.hpp"
+#include "components/DrawOrder.hpp"
 #include "components/Position.hpp"
 #include "components/Size.hpp"
 #include "resources/FixedClock.hpp"
@@ -26,7 +27,8 @@ GameConfig::GameConfig(unsigned int size) : _size(static_cast<int>(size), static
     initialize();
 }
 
-void GameConfig::addBackground(sf::IntRect bounds, sf::Vector2f position, const std::string &texture)
+void GameConfig::addBackground(
+    sf::IntRect bounds, long int drawOrder, sf::Vector2f position, const std::string &texture)
 {
     float scaleY = (static_cast<float>(_size.y) / 256.f);
     float scaleX = (static_cast<float>(_size.x) / 256.f);
@@ -34,6 +36,7 @@ void GameConfig::addBackground(sf::IntRect bounds, sf::Vector2f position, const 
     auto &rect = _registry.entityBuilder()
                      .with<sf::RectangleShape>(sf::Vector2f(
                          static_cast<float>(bounds.width) * scaleX, static_cast<float>(bounds.height) * scaleY))
+                     .with<DrawOrder>(drawOrder)
                      .build()
                      .get(_registry.getStorage<sf::RectangleShape>());
     rect.setTextureRect(bounds);
@@ -57,41 +60,43 @@ void GameConfig::initialize()
     addBackground(sf::IntRect(67, 297, 256, 256));
     // Back blur top - bottom
     addBackground(sf::IntRect(67, 687, 256, 188));
-    addBackground(sf::IntRect(67, 877, 256, 36), sf::Vector2f(0.f, 220.f));
+    addBackground(sf::IntRect(67, 877, 256, 36), -1000, sf::Vector2f(0.f, 220.f));
 
     /// Bush
-    addBackground(sf::IntRect(61, 595, 32, 64), sf::Vector2f(194.f, 135.f));
+    addBackground(sf::IntRect(61, 595, 32, 64), -100, sf::Vector2f(194.f, 135.f));
 
     /// Tree + 5 bushes (top to bottom)
-    addBackground(sf::IntRect(3, 555, 56, 130), sf::Vector2f(10.f, 69.f));
-    addBackground(sf::IntRect(137, 595, 32, 24), sf::Vector2f(13.f, 47.f));
-    addBackground(sf::IntRect(231, 595, 32, 24), sf::Vector2f(36.f, 70.f));
-    addBackground(sf::IntRect(265, 595, 24, 16), sf::Vector2f(29.f, 90.f));
-    addBackground(sf::IntRect(205, 595, 24, 24), sf::Vector2f(7.f, 93.f));
-    addBackground(sf::IntRect(137, 595, 32, 24), sf::Vector2f(46.f, 103.f));
+    addBackground(sf::IntRect(3, 555, 56, 130), 10, sf::Vector2f(10.f, 69.f));
+    addBackground(sf::IntRect(137, 595, 32, 24), 10, sf::Vector2f(13.f, 47.f));
+    addBackground(sf::IntRect(231, 595, 32, 24), 10, sf::Vector2f(36.f, 70.f));
+    addBackground(sf::IntRect(265, 595, 24, 16), 10, sf::Vector2f(29.f, 90.f));
+    addBackground(sf::IntRect(205, 595, 24, 24), 10, sf::Vector2f(7.f, 93.f));
+    addBackground(sf::IntRect(137, 595, 32, 24), 10, sf::Vector2f(46.f, 103.f));
 
     /// Grass
-    addBackground(sf::IntRect(61, 555, 256, 38), sf::Vector2f(0.f, 163.f));
+    addBackground(sf::IntRect(61, 555, 256, 38), 10, sf::Vector2f(0.f, 163.f));
 
     /// Round, shots, level, score
-    addBackground(sf::IntRect(325, 409, 24, 8), sf::Vector2f(24.f, 208.f), "sprites");
-    addBackground(sf::IntRect(445, 428, 29, 21), sf::Vector2f(21.f, 221.f), "sprites");
-    addBackground(sf::IntRect(325, 428, 117, 21), sf::Vector2f(61.f, 221.f), "sprites");
-    addBackground(sf::IntRect(421, 406, 53, 21), sf::Vector2f(189.f, 221.f), "sprites");
+    addBackground(sf::IntRect(325, 409, 24, 8), 1000, sf::Vector2f(24.f, 208.f), "sprites");
+    addBackground(sf::IntRect(445, 428, 29, 21), 1000, sf::Vector2f(21.f, 221.f), "sprites");
+    addBackground(sf::IntRect(325, 428, 117, 21), 1000, sf::Vector2f(61.f, 221.f), "sprites");
+    addBackground(sf::IntRect(421, 406, 53, 21), 1000, sf::Vector2f(189.f, 221.f), "sprites");
 
     /// Shots
-    addBackground(sf::IntRect(64, 386, 4, 7), sf::Vector2f(25.f, 224.f), "sprites");
-    addBackground(sf::IntRect(64, 386, 4, 7), sf::Vector2f(33.5f, 224.f), "sprites");
-    addBackground(sf::IntRect(64, 386, 4, 7), sf::Vector2f(42.f, 224.f), "sprites");
-    addBackground(sf::IntRect(133, 450, 21, 6), sf::Vector2f(25.f, 233.f), "sprites");
+    addBackground(sf::IntRect(64, 386, 4, 7), 1010, sf::Vector2f(25.f, 224.f), "sprites");
+    addBackground(sf::IntRect(64, 386, 4, 7), 1010, sf::Vector2f(33.5f, 224.f), "sprites");
+    addBackground(sf::IntRect(64, 386, 4, 7), 1010, sf::Vector2f(42.f, 224.f), "sprites");
+    addBackground(sf::IntRect(133, 450, 21, 6), 1010, sf::Vector2f(25.f, 233.f), "sprites");
 
-    /// Ducks
+    /// Duck icons
     for (int i = 0; i < 10; i++)
-        addBackground(sf::IntRect(340, 386, 7, 7), sf::Vector2f(96.f + static_cast<float>(i) * 8.f, 224.f), "sprites");
+        addBackground(
+            sf::IntRect(340, 386, 7, 7), 1010, sf::Vector2f(96.f + static_cast<float>(i) * 8.f, 224.f), "sprites");
 
     // Score
     for (int i = 0; i < 6; i++)
-        addBackground(sf::IntRect(357, 385, 7, 7), sf::Vector2f(192.f + static_cast<float>(i) * 8.f, 224.f), "sprites");
+        addBackground(
+            sf::IntRect(357, 385, 7, 7), 1010, sf::Vector2f(192.f + static_cast<float>(i) * 8.f, 224.f), "sprites");
 
     /// Target
     auto &targetRect = _registry.entityBuilder()
@@ -101,6 +106,7 @@ void GameConfig::initialize()
                                    entity.get(r.getStorage<sf::RectangleShape>())
                                        .setPosition(static_cast<float>(e.x), static_cast<float>(e.y));
                                })
+                           .with<DrawOrder>(100)
                            .build()
                            .get(_registry.getStorage<sf::RectangleShape>());
     targetRect.setOrigin(sf::Vector2f(15.f, 15.f));
@@ -131,11 +137,12 @@ void GameConfig::run()
         processInputs();
 
         /// @brief Make less update with higher delay to try to reduce missed update frames
-        auto updateTime = (lag > 10 * msPerUpdate) ? 3 * msPerUpdate : msPerUpdate;
-        while (lag >= updateTime) {
-            clock.newFrame(updateTime);
+        if (lag > 10 * msPerUpdate)
+            lag = 3 * msPerUpdate;
+        while (lag >= msPerUpdate) {
+            clock.newFrame(msPerUpdate);
             update();
-            lag -= updateTime;
+            lag -= msPerUpdate;
         }
 
         render();

@@ -11,6 +11,7 @@
 #include "components/Duck.hpp"
 #include "components/Position.hpp"
 #include "components/Size.hpp"
+#include "resources/AssetsMap.hpp"
 #include "resources/FixedClock.hpp"
 #include "resources/RandomDevice.hpp"
 #include "systems/ClearWindow.hpp"
@@ -27,7 +28,9 @@ namespace esf = ecstasy::integration::sfml;
 namespace event = ecstasy::integration::event;
 namespace user_action = ecstasy::integration::user_action;
 
-GameConfig::GameConfig(unsigned int size) : _size(static_cast<int>(size), static_cast<int>(size))
+GameConfig::GameConfig(unsigned int size)
+    : _size(static_cast<int>(size), static_cast<int>(size)),
+      _game(sf::Vector2f(static_cast<float>(_size.x) / 256.f, static_cast<float>(_size.y) / 256.f))
 {
     initialize();
 }
@@ -45,21 +48,22 @@ void GameConfig::addBackground(
                      .build()
                      .get(_registry.getStorage<sf::RectangleShape>());
     rect.setTextureRect(bounds);
-    rect.setTexture(&_textures.at(texture));
+    rect.setTexture(&_registry.getResource<Textures>().get(texture));
     rect.setPosition(position.x * scaleX, position.y * scaleY);
 }
 
 void GameConfig::initialize()
 {
-    _textures.emplace(std::make_pair("background", sf::Texture())).first->second.loadFromFile("assets/backgrounds.png");
-    _textures.emplace(std::make_pair("sprites", sf::Texture())).first->second.loadFromFile("assets/sprites.png");
-    _textures.emplace(std::make_pair("target", sf::Texture())).first->second.loadFromFile("assets/target.png");
     _registry
         .addResource<esf::RenderWindow>(
             sf::VideoMode(static_cast<unsigned int>(_size.x), static_cast<unsigned int>(_size.y)), "Duck Hunt")
         .get()
         .setMouseCursorVisible(false);
     _registry.addResource<RandomDevice>();
+    auto &textures = _registry.addResource<Textures>();
+    textures.emplace("background").loadFromFile("assets/backgrounds.png");
+    textures.emplace("sprites").loadFromFile("assets/sprites.png");
+    textures.emplace("target").loadFromFile("assets/target.png");
 
     // Back
     addBackground(sf::IntRect(67, 297, 256, 256));
@@ -128,7 +132,7 @@ void GameConfig::initialize()
             .build()
             .get(_registry.getStorage<sf::RectangleShape>());
     targetRect.setOrigin(sf::Vector2f(15.f, 15.f));
-    targetRect.setTexture(&_textures.at("target"));
+    targetRect.setTexture(&_registry.getResource<Textures>().get("target"));
 
     /// User
     user_action::Users &users = _registry.addResource<user_action::Users>();
@@ -144,7 +148,7 @@ void GameConfig::initialize()
     _registry.addSystem<DisplayWindow, _game_loop_render + 1000000>();
     _registry.addSystem<Movement, _game_loop_update>();
 
-    _game.newRound(*this);
+    _game.newRound(_registry);
 }
 
 void GameConfig::run()
@@ -193,9 +197,4 @@ void GameConfig::render()
 sf::Vector2i GameConfig::getSize()
 {
     return _size;
-}
-
-sf::Texture &GameConfig::getTexture(std::string name)
-{
-    return _textures.at(name);
 }

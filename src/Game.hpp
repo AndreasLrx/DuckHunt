@@ -12,21 +12,23 @@
 #ifndef GAME_HPP_
 #define GAME_HPP_
 
+#include <SFML/Graphics.hpp>
 #include <ecstasy/registry/Registry.hpp>
 #include "Player.hpp"
 
 class GameConfig;
 class Game {
   public:
-    Game();
+    Game(sf::Vector2f scale = sf::Vector2f(1.f, 1.f));
     ~Game() = default;
 
-    void newRound(GameConfig &config);
-    void newWave(GameConfig &config);
+    void newRound(ecstasy::Registry &registry);
+    void newWave(ecstasy::Registry &registry);
 
-    void addDuck(GameConfig &config);
+    void addDuck(ecstasy::Registry &registry);
 
   private:
+    sf::Vector2f _scale;
     size_t _score;
     size_t _round;
     Player _player;

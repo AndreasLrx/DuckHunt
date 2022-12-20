@@ -7,43 +7,40 @@
 #include "components/Duck.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
+#include "resources/AssetsMap.hpp"
 #include "resources/RandomDevice.hpp"
 
-Game::Game() : _score(0), _round(0)
+Game::Game(sf::Vector2f scale) : _scale(scale), _score(0), _round(0)
 {
 }
 
-void Game::newRound(GameConfig &config)
+void Game::newRound(ecstasy::Registry &registry)
 {
     ++_round;
-    newWave(config);
+    newWave(registry);
     _score += 1000;
 }
 
-void Game::newWave(GameConfig &config)
+void Game::newWave(ecstasy::Registry &registry)
 {
     _player.reloadAmmo();
     for (int i = 0; i < 2; i++)
-        addDuck(config);
+        addDuck(registry);
 }
 
-void Game::addDuck(GameConfig &config)
+void Game::addDuck(ecstasy::Registry &registry)
 {
-    auto size = config.getSize();
-    float scaleY = (static_cast<float>(size.y) / 256.f);
-    float scaleX = (static_cast<float>(size.x) / 256.f);
-    auto &rand = config.getRegistry().getResource<RandomDevice>();
+    auto &rand = registry.getResource<RandomDevice>();
 
-    auto &rect = config.getRegistry()
-                     .entityBuilder()
-                     .with<sf::RectangleShape>(sf::Vector2f(34.f * scaleX, 29.f * scaleY))
-                     .with<Position>(static_cast<float>(rand.randInt(0, 227)) * scaleX,
-                         static_cast<float>(rand.randInt(0, 160)) * scaleY)
+    auto &rect = registry.entityBuilder()
+                     .with<sf::RectangleShape>(sf::Vector2f(34.f * _scale.x, 29.f * _scale.y))
+                     .with<Position>(static_cast<float>(rand.randInt(0, 227)) * _scale.x,
+                         static_cast<float>(rand.randInt(0, 160)) * _scale.y)
                      .with<DrawOrder>(0)
-                     .with<Velocity>(20.f * scaleX, 20.f * scaleY)
+                     .with<Velocity>(20.f * _scale.x, 20.f * _scale.y)
                      .with<Duck>()
                      .build()
-                     .get(config.getRegistry().getStorage<sf::RectangleShape>());
-    rect.setTexture(&config.getTexture("sprites"));
+                     .get(registry.getStorage<sf::RectangleShape>());
+    rect.setTexture(&registry.getResource<Textures>().get("sprites"));
     rect.setTextureRect(sf::IntRect(15, 259, 34, 29));
 }

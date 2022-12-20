@@ -8,9 +8,12 @@
 #ifndef DUCK_HPP_
 #define DUCK_HPP_
 
-class Duck {
-  public:
-    Duck() = default;
+struct Duck {
+    int id;
+
+    Duck(int pId = 0) : id(pId)
+    {
+    }
 };
 
 #endif /* !DUCK_HPP_ */

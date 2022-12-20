@@ -9,6 +9,7 @@
 #include "Actions.hpp"
 #include "components/DrawOrder.hpp"
 #include "components/Duck.hpp"
+#include "components/DuckIcon.hpp"
 #include "components/Position.hpp"
 #include "components/Size.hpp"
 #include "resources/AssetsMap.hpp"
@@ -33,21 +34,22 @@ GameConfig::GameConfig(unsigned int size) : _size(static_cast<int>(size), static
     initialize();
 }
 
-void GameConfig::addBackground(
+ecstasy::Entity GameConfig::addBackground(
     sf::IntRect bounds, long int drawOrder, sf::Vector2f position, const std::string &texture)
 {
     float scaleY = (static_cast<float>(_size.y) / 256.f);
     float scaleX = (static_cast<float>(_size.x) / 256.f);
 
-    auto &rect = _registry.entityBuilder()
-                     .with<sf::RectangleShape>(sf::Vector2f(
-                         static_cast<float>(bounds.width) * scaleX, static_cast<float>(bounds.height) * scaleY))
-                     .with<DrawOrder>(drawOrder)
-                     .build()
-                     .get(_registry.getStorage<sf::RectangleShape>());
+    ecstasy::Entity entity = _registry.entityBuilder()
+                                 .with<sf::RectangleShape>(sf::Vector2f(static_cast<float>(bounds.width) * scaleX,
+                                     static_cast<float>(bounds.height) * scaleY))
+                                 .with<DrawOrder>(drawOrder)
+                                 .build();
+    auto &rect = entity.get(_registry.getStorage<sf::RectangleShape>());
     rect.setTextureRect(bounds);
     rect.setTexture(&_registry.getResource<Textures>().get(texture));
     rect.setPosition(position.x * scaleX, position.y * scaleY);
+    return entity;
 }
 
 void GameConfig::initialize()
@@ -100,7 +102,8 @@ void GameConfig::initialize()
     /// Duck icons
     for (int i = 0; i < 10; i++)
         addBackground(
-            sf::IntRect(340, 386, 7, 7), 1010, sf::Vector2f(96.f + static_cast<float>(i) * 8.f, 224.f), "sprites");
+            sf::IntRect(340, 386, 7, 7), 1010, sf::Vector2f(96.f + static_cast<float>(i) * 8.f, 224.f), "sprites")
+            .add(_registry.getStorageSafe<DuckIcon>(), i);
 
     // Score
     for (int i = 0; i < 6; i++)
@@ -124,12 +127,8 @@ void GameConfig::initialize()
                     auto target = e.get(r.getStorage<sf::RectangleShape>()).getPosition();
                     for (auto [rect, duck, entity] : r.query<sf::RectangleShape, Duck, ecstasy::Entities>()) {
                         (void)duck;
-                        if (rect.getGlobalBounds().contains(target)) {
-                            r.eraseEntity(entity);
-                            auto q = r.query<Duck>();
-                            if (q.getMask().firstSet() == q.getMask().size() - 1)
-                                r.getResource<Game>().endWave(r);
-                        }
+                        if (rect.getGlobalBounds().contains(target))
+                            r.getResource<Game>().killDuck(r, entity, duck);
                     }
                 },
                 static_cast<size_t>(Actions::Shot))

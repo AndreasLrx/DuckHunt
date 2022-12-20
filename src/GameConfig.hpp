@@ -36,8 +36,8 @@ class GameConfig {
     sf::Vector2i getSize();
 
   private:
-    void addBackground(sf::IntRect rect, long int drawOrder = -1000, sf::Vector2f position = sf::Vector2f(0.f, 0.f),
-        const std::string &texture = "background");
+    ecstasy::Entity addBackground(sf::IntRect rect, long int drawOrder = -1000,
+        sf::Vector2f position = sf::Vector2f(0.f, 0.f), const std::string &texture = "background");
 
     ecstasy::Registry _registry;
     sf::Vector2i _size;

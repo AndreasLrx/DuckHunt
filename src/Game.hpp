@@ -16,6 +16,7 @@
 #include <ecstasy/registry/Registry.hpp>
 #include <ecstasy/resources/Resource.hpp>
 #include "Player.hpp"
+#include "components/Duck.hpp"
 
 class GameConfig;
 class Game : public ecstasy::Resource {
@@ -27,7 +28,8 @@ class Game : public ecstasy::Resource {
     void newWave(ecstasy::Registry &registry);
     void endWave(ecstasy::Registry &registry);
 
-    void addDuck(ecstasy::Registry &registry);
+    void addDuck(ecstasy::Registry &registry, int id);
+    void killDuck(ecstasy::Registry &registry, ecstasy::Entity entity, Duck &duck);
 
   private:
     sf::Vector2f _scale;

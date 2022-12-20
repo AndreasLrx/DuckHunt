@@ -17,7 +17,7 @@
 class Position : public sf::Vector2f {
   public:
     template <typename... Args>
-    Position(Args &...args) : sf::Vector2f(std::forward<Args &>(args)...)
+    Position(Args &&...args) : sf::Vector2f(std::forward<Args &&>(args)...)
     {
     }
 

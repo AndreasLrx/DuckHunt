@@ -11,4 +11,6 @@ set(SRC
     ${INCROOT}/DrawShape.hpp
     ${SRCROOT}/GetRenderWindow.cpp
     ${INCROOT}/GetRenderWindow.hpp
+    ${SRCROOT}/Movement.cpp
+    ${INCROOT}/Movement.hpp
     PARENT_SCOPE)

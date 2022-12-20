@@ -10,6 +10,7 @@ set(SRC
     ${INCROOT}/Player.hpp)
 set(INCDIRS ${INCROOT})
 
+add_subdirectory(resources)
 add_subdirectory(systems)
 
 # Source groups are a feature in Visual Studio.

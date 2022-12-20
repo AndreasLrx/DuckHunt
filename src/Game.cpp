@@ -4,6 +4,8 @@
 #include "Game.hpp"
 #include "GameConfig.hpp"
 #include "RandomDevice.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
 
 Game::Game() : _score(0), _round(0)
 {
@@ -32,10 +34,11 @@ void Game::addDuck(GameConfig &config)
     auto &rect = config.getRegistry()
                      .entityBuilder()
                      .with<sf::RectangleShape>(sf::Vector2f(34.f * scaleX, 29.f * scaleY))
+                     .with<Position>(static_cast<float>(rand.randInt(0, 227)) * scaleX,
+                         static_cast<float>(rand.randInt(0, 160)) * scaleY)
+                     .with<Velocity>(20.f * scaleX, 20.f * scaleY)
                      .build()
                      .get(config.getRegistry().getStorage<sf::RectangleShape>());
     rect.setTexture(&config.getTexture("sprites"));
     rect.setTextureRect(sf::IntRect(15, 259, 34, 29));
-    rect.setPosition(sf::Vector2f(
-        static_cast<float>(rand.randInt(0, 227)) * scaleX, static_cast<float>(rand.randInt(0, 160)) * scaleY));
 }

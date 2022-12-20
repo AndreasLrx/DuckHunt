@@ -9,10 +9,12 @@
 #include "RandomDevice.hpp"
 #include "components/Position.hpp"
 #include "components/Size.hpp"
+#include "resources/FixedClock.hpp"
 #include "systems/ClearWindow.hpp"
 #include "systems/DisplayWindow.hpp"
 #include "systems/DrawShape.hpp"
 #include "systems/GetRenderWindow.hpp"
+#include "systems/Movement.hpp"
 
 #include "GameConfig.hpp"
 
@@ -108,6 +110,7 @@ void GameConfig::initialize()
     _registry.addSystem<ClearWindow, _game_loop_render>(sf::Color::White);
     _registry.addSystem<DrawShape, _game_loop_render + 1000>();
     _registry.addSystem<DisplayWindow, _game_loop_render + 1000000>();
+    _registry.addSystem<Movement, _game_loop_update>();
 
     _game.newRound(*this);
 }
@@ -115,20 +118,24 @@ void GameConfig::initialize()
 void GameConfig::run()
 {
     std::chrono::system_clock::time_point previous = std::chrono::system_clock::now();
-    std::chrono::milliseconds lag(0);
+    std::chrono::microseconds lag(0);
     const std::chrono::milliseconds msPerUpdate(1000 / 60);
+    auto &clock = _registry.addResource<FixedClock>();
 
     while (getRenderWindow(_registry).get().isOpen()) {
         std::chrono::system_clock::time_point current = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current - previous);
+        auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(current - previous);
         previous = current;
         lag += elapsed;
 
         processInputs();
 
-        while (lag >= msPerUpdate) {
+        /// @brief Make less update with higher delay to try to reduce missed update frames
+        auto updateTime = (lag > 10 * msPerUpdate) ? 3 * msPerUpdate : msPerUpdate;
+        while (lag >= updateTime) {
+            clock.newFrame(updateTime);
             update();
-            lag -= msPerUpdate;
+            lag -= updateTime;
         }
 
         render();

@@ -50,6 +50,11 @@ void Game::endWave(ecstasy::Registry &registry)
 void Game::addDuck(ecstasy::Registry &registry, int id)
 {
     auto &rand = registry.getResource<RandomDevice>();
+    int randInt = rand.randInt(0, 100);
+    Duck::Color color = (randInt < 50) ? Duck::Color::Black : ((randInt < 80) ? Duck::Color::Blue : Duck::Color::Brown);
+    sf::Vector2i rectPos = (color == Duck::Color::Black)
+        ? sf::Vector2i(15, 258)
+        : ((color == Duck::Color::Blue) ? sf::Vector2i(207, 290) : sf::Vector2i(399, 322));
 
     auto &rect = registry.entityBuilder()
                      .with<sf::RectangleShape>(sf::Vector2f(34.f * _scale.x, 29.f * _scale.y))
@@ -57,11 +62,11 @@ void Game::addDuck(ecstasy::Registry &registry, int id)
                          static_cast<float>(rand.randInt(0, 160)) * _scale.y)
                      .with<DrawOrder>(0)
                      .with<Velocity>(20.f * _scale.x, 20.f * _scale.y)
-                     .with<Duck>(id)
+                     .with<Duck>(id, color)
                      .build()
                      .get(registry.getStorage<sf::RectangleShape>());
     rect.setTexture(&registry.getResource<Textures>().get("sprites"));
-    rect.setTextureRect(sf::IntRect(15, 259, 34, 29));
+    rect.setTextureRect(sf::IntRect(rectPos, sf::Vector2i(34, 30)));
 }
 
 void Game::killDuck(ecstasy::Registry &registry, ecstasy::Entity entity, Duck &duck)
@@ -70,6 +75,8 @@ void Game::killDuck(ecstasy::Registry &registry, ecstasy::Entity entity, Duck &d
         if (icon.id == duck.id)
             rect.setFillColor(sf::Color::Red);
     }
+
+    _score += (static_cast<size_t>(duck.color) + 1) * 500;
     registry.eraseEntity(entity);
     auto q = registry.query<Duck>();
     if (q.getMask().firstSet() == q.getMask().size() - 1)

@@ -9,9 +9,12 @@
 #define DUCK_HPP_
 
 struct Duck {
-    int id;
+    enum class Color { Black, Blue, Brown, Count };
 
-    Duck(int pId = 0) : id(pId)
+    int id;
+    Color color;
+
+    Duck(int pId = 0, Color pColor = Color::Black) : id(pId), color(pColor)
     {
     }
 };

@@ -8,6 +8,7 @@
 #include "components/Duck.hpp"
 #include "components/DuckIcon.hpp"
 #include "components/Position.hpp"
+#include "components/SpriteSheetAnimation.hpp"
 #include "components/Velocity.hpp"
 #include "resources/AssetsMap.hpp"
 #include "resources/RandomDevice.hpp"
@@ -52,21 +53,28 @@ void Game::addDuck(ecstasy::Registry &registry, int id)
     auto &rand = registry.getResource<RandomDevice>();
     int randInt = rand.randInt(0, 100);
     Duck::Color color = (randInt < 50) ? Duck::Color::Black : ((randInt < 80) ? Duck::Color::Blue : Duck::Color::Brown);
-    sf::Vector2i rectPos = (color == Duck::Color::Black)
-        ? sf::Vector2i(15, 258)
-        : ((color == Duck::Color::Blue) ? sf::Vector2i(207, 290) : sf::Vector2i(399, 322));
+    sf::Vector2i animSize(64, 32);
+    std::vector<sf::IntRect> frames;
+    size_t startId = static_cast<size_t>(color) * 11;
+
+    for (size_t i = 0; i < 3; i++)
+        frames.emplace_back(sf::IntRect{static_cast<int>(((i + startId) % 8) * animSize.x),
+            static_cast<int>(257 + ((i + startId) / 8) * animSize.y), animSize.x, animSize.y});
 
     auto &rect = registry.entityBuilder()
-                     .with<sf::RectangleShape>(sf::Vector2f(34.f * _scale.x, 29.f * _scale.y))
+                     .with<sf::RectangleShape>(sf::Vector2f(64.f * _scale.x, 32.f * _scale.y))
                      .with<Position>(static_cast<float>(rand.randInt(0, 227)) * _scale.x,
                          static_cast<float>(rand.randInt(0, 160)) * _scale.y)
                      .with<DrawOrder>(0)
                      .with<Velocity>(20.f * _scale.x, 20.f * _scale.y)
                      .with<Duck>(id, color)
+                     .with<SpriteSheetAnimation>(0.2f, frames)
                      .build()
                      .get(registry.getStorage<sf::RectangleShape>());
     rect.setTexture(&registry.getResource<Textures>().get("sprites"));
-    rect.setTextureRect(sf::IntRect(rectPos, sf::Vector2i(34, 30)));
+    rect.setTextureRect(sf::IntRect(sf::Vector2i(static_cast<int>(((startId) % 8) * animSize.x),
+                                        static_cast<int>(257 + ((startId) / 8) * animSize.y)),
+        sf::Vector2i(64, 32)));
 }
 
 void Game::killDuck(ecstasy::Registry &registry, ecstasy::Entity entity, Duck &duck)

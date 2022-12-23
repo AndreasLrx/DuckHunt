@@ -20,6 +20,7 @@
 #include "systems/DrawShape.hpp"
 #include "systems/GetRenderWindow.hpp"
 #include "systems/Movement.hpp"
+#include "systems/UpdateAnimation.hpp"
 #include <ecstasy/integrations/user_action/ActionListener.hpp>
 #include <ecstasy/integrations/user_action/Users.hpp>
 
@@ -150,6 +151,7 @@ void GameConfig::initialize()
     _registry.addSystem<DrawShape, _game_loop_render + 1000>();
     _registry.addSystem<DisplayWindow, _game_loop_render + 1000000>();
     _registry.addSystem<Movement, _game_loop_update>();
+    _registry.addSystem<UpdateAnimation, _game_loop_update>();
 
     game.newRound(_registry);
 }

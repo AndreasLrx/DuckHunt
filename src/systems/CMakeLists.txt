@@ -13,4 +13,6 @@ set(SRC
     ${INCROOT}/GetRenderWindow.hpp
     ${SRCROOT}/Movement.cpp
     ${INCROOT}/Movement.hpp
+    ${SRCROOT}/UpdateAnimation.cpp
+    ${INCROOT}/UpdateAnimation.hpp
     PARENT_SCOPE)
